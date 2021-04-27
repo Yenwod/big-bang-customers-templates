@@ -1,20 +1,27 @@
 locals {
+  # Based on VPC CIDR, create subnet ranges
   public_subnet_cidrs = [
-    cidrsubnet(var.vpc_cidr, ceil(log(6, 2)), 0),
-    cidrsubnet(var.vpc_cidr, ceil(log(6, 2)), 1),
+    cidrsubnet(var.vpc_cidr, 8, 0),
+    cidrsubnet(var.vpc_cidr, 8, 1),
+    cidrsubnet(var.vpc_cidr, 8, 2),
   ]
 
   private_subnet_cidrs = [
-    cidrsubnet(var.vpc_cidr, ceil(log(6, 2)), 2),
-    cidrsubnet(var.vpc_cidr, ceil(log(6, 2)), 3),
+    cidrsubnet(var.vpc_cidr, 8, 3),
+    cidrsubnet(var.vpc_cidr, 8, 4),
+    cidrsubnet(var.vpc_cidr, 8, 5),
   ]
 
   intra_subnet_cidrs = [
-    cidrsubnet(var.vpc_cidr, ceil(log(6, 2)), 4),
-    cidrsubnet(var.vpc_cidr, ceil(log(6, 2)), 5),
+    cidrsubnet(var.vpc_cidr, 8, 6),
+    cidrsubnet(var.vpc_cidr, 8, 7),
+    cidrsubnet(var.vpc_cidr, 8, 8),
   ]
 }
 
+data "aws_availability_zones" "available" {
+  state = "available"
+}
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "2.78.0"
