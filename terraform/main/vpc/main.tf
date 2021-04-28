@@ -1,27 +1,26 @@
 locals {
+  # Number of availability zones determines number of CIDRs we need
+  num_azs = length(data.aws_availability_zones.available.names)
+
+  # Size of the CIDR range, this is added to the VPC CIDR bits
+  # For example if the VPC CIDR is 10.0.0.0/16 and the CIDR size is 8, the CIDR will be 10.0.xx.0/24
+  cidr_size = 8
+
   # Based on VPC CIDR, create subnet ranges
-  public_subnet_cidrs = [
-    cidrsubnet(var.vpc_cidr, 8, 0),
-    cidrsubnet(var.vpc_cidr, 8, 1),
-    cidrsubnet(var.vpc_cidr, 8, 2),
-  ]
-
-  private_subnet_cidrs = [
-    cidrsubnet(var.vpc_cidr, 8, 3),
-    cidrsubnet(var.vpc_cidr, 8, 4),
-    cidrsubnet(var.vpc_cidr, 8, 5),
-  ]
-
-  intra_subnet_cidrs = [
-    cidrsubnet(var.vpc_cidr, 8, 6),
-    cidrsubnet(var.vpc_cidr, 8, 7),
-    cidrsubnet(var.vpc_cidr, 8, 8),
-  ]
+  cidr_index = range(local.num_azs)
+  public_subnet_cidrs = [ for i in local.cidr_index : cidrsubnet(var.vpc_cidr, local.cidr_size, i) ]
+  private_subnet_cidrs = [ for i in local.cidr_index : cidrsubnet(var.vpc_cidr, local.cidr_size, i + local.num_azs) ]
+  intra_subnet_cidrs = [ for i in local.cidr_index : cidrsubnet(var.vpc_cidr, local.cidr_size, i + (local.num_azs * 2)) ]
 }
 
 data "aws_availability_zones" "available" {
   state = "available"
+  filter {
+    name = "group-name"
+    values = [var.aws_region]
+  }
 }
+
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
   version = "2.78.0"
@@ -29,7 +28,8 @@ module "vpc" {
   name = var.name
   cidr = var.vpc_cidr
 
-  azs             = ["${var.aws_region}a", "${var.aws_region}b", "${var.aws_region}c"]
+  azs             = data.aws_availability_zones.available.names
+  #azs             = ["${var.aws_region}a", "${var.aws_region}b", "${var.aws_region}c"]
   public_subnets  = local.public_subnet_cidrs
   private_subnets = local.private_subnet_cidrs
   intra_subnets   = local.intra_subnet_cidrs

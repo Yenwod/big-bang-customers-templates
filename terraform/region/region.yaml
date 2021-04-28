@@ -6,5 +6,5 @@ name: "us-gov-west-1"
 
 # Tags to apply to all resources in region
 tags:
-  terraform: "true"
-  owner: "bigbang"
+  Terraform: "true"
+  Owner: "bigbang"
