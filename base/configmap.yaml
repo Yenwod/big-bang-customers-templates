@@ -15,7 +15,10 @@ gatekeeper:
 
 kiali:
   enabled: false
-  
+
+jaeger:
+  enabled: false
+
 istio:
   values:
     kiali:
