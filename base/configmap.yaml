@@ -13,6 +13,9 @@ gatekeeper:
   values:
     replicas: 1
 
+kiali:
+  enabled: false
+  
 istio:
   values:
     kiali:
