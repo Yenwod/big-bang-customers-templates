@@ -1,6 +1,8 @@
 locals {
-  region = yamldecode(file(find_in_parent_folders("region.yaml")))
-  env = yamldecode(file(find_in_parent_folders("env.yaml")))
+  env = merge(
+    yamldecode(file(find_in_parent_folders("region.yaml"))),
+    yamldecode(file(find_in_parent_folders("env.yaml")))
+  )
 }
 
 terraform {
@@ -39,7 +41,7 @@ dependency "ssh" {
 }
 
 inputs = {
-  name               = "${local.env.name}-agent"
+  name               = "generic"
   vpc_id             = dependency.vpc.outputs.vpc_id
   subnets            = dependency.vpc.outputs.private_subnets
   ami                = local.env.cluster.agent.image
@@ -67,6 +69,6 @@ inputs = {
 
   pre_userdata = local.env.cluster.init_script
 
-  tags = merge(local.region.tags, local.env.tags, {})
+  tags = merge(local.env.region_tags, local.env.tags, {})
 }
 

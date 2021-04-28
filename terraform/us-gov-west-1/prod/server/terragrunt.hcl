@@ -1,6 +1,8 @@
 locals {
-  region = yamldecode(file(find_in_parent_folders("region.yaml")))
-  env = yamldecode(file(find_in_parent_folders("env.yaml")))
+  env = merge(
+    yamldecode(file(find_in_parent_folders("region.yaml"))),
+    yamldecode(file(find_in_parent_folders("env.yaml")))
+  )
 }
 
 terraform {
@@ -50,7 +52,7 @@ inputs = {
 
   pre_userdata = local.env.cluster.init_script
 
-  tags = merge(local.env.tags, local.region.tags, {})
+  tags = merge(local.env.region_tags, local.env.tags, {})
 
   # Big Bang uses Istio instead of NGINX
   # https://docs.rke2.io/advanced/#disabling-server-charts/

@@ -2,9 +2,9 @@
 # Common variables for the region
 
 # Name of the AWS region
-name: "us-gov-west-1"
+region: "us-gov-west-1"
 
 # Tags to apply to all resources in region
-tags:
+region_tags:
   Terraform: "true"
   Owner: "bigbang"
