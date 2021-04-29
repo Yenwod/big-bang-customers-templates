@@ -57,15 +57,53 @@ terraform
     TBD
     ```
 
-## Infrastructure Manifest
+## Infrastructure
+
+### Manifest
+
+Once the terraform has run, you will have the following resources deployed:
+
+- [Virtual Private Cloud (VPC)](https://aws.amazon.com/vpc/?vpc-blogs.sort-by=item.additionalFields.createdDate&vpc-blogs.sort-order=desc)
+- [Internet Gateway](https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Internet_Gateway.html)
+- Public subnets
+  - One for each [availability zone](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html)
+  - VPC CIDR traffic routed locally
+  - Connected to Internet
+- Private subnets
+  - One for each [availability zone](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using-regions-availability-zones.html)
+  - VPC CIDR traffic routed locally
+  - Other traffic routed to [NAT Gateway](https://docs.aws.amazon.com/vpc/latest/userguide/vpc-nat-gateway.html)
+- NAT Gateway
+  - [Elastic IP](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/elastic-ip-addresses-eip.html) assigned for internet access
+  - Prevents internet ingress to private subnet
+  - Allows internet egress from private subnet
+- [RKE2](https://docs.rke2.io/) Kubernetes Cluster
+  - RKE2 Control Plane
+  - RKE2 Servers
+    - Autoscaled node pool
+    - Anti-affinity
+  - RKE2 Agents (Generic)
+    - Autoscaled node pool
+    - Anti-affinity
+  - Security Groups
+    - Egress not restricted
+    - Internal cluster ingress allowed
+    - Control Plane traffic limited to port 6443 and 9345 to servers
+  - SSH keys created and stored on all nodes.  Private key is stored locally in `~/.ssh`
+- S3 Storage Bucket
+  - RKE2 Kubeconfig for accessing cluster
+  - RKE2 access token for adding additional nodes
+
+### Diagram
 
 ```mermaid
 flowchart TD;
 
-internet((Internet)) ---|Elastic IP| igw
+internet((Internet)) --- igw
 
 subgraph VPC
-  igw(Internet Gateway) --- nat1 & nat2 & nat3
+  igw(Internet Gateway) ---|Elastic IP| nat1 & nat2 & nat3
+
 
   subgraph za [Zone A]
     nat1 --- zapriv
@@ -73,7 +111,7 @@ subgraph VPC
       nat1(NAT Gateway)
     end
     subgraph zapriv [Private Subnet]
-      cp(RKE2 Control Plane)
+      cp(RKE2 Control Plane\nLoad Balancer)
       s1(RKE2 Server Node)
       a1(RKE2 Agent Node)
     end
@@ -103,55 +141,38 @@ subgraph VPC
 
   s1 & s2 & s3 -.- sscale(Autoscale: Server Node Pool)
   a1 & a2 & a3 -.- ascale(Autoscale: Agent Node Pool)
+
+end
+
+subgraph store [S3 Bucket]
+  subgraph RKE2
+    yaml(RKE2 Kubeconfig)
+    token(RKE2 Access Token)
+  end
 end
 ```
 
-## Flow
+## RKE2 Storage
 
-1. Creates SSH Key Pair
-1. Add VPC
-1. Add EIP NAT
-1. Add internet gateway
-1. Add route tables
-1. Create subnets
-1. Add Security groups for Endpoints
-1. Add NAT Gateway (public)
-1. Add NAT Gateway (private)
-1. Create random password token (stored in S3)
-1. Create security grouips and rules
-1. Create S3 bucket for storage
-1. Create IAM role/profile
-1. Create autoscaling group
+In order for Big Bang to deploy properly, it must have a default storage class.  The following will install a storage class for [AWS EBS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html).
+
+### Local-Path
+
+```bash
+kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+### Longhorn
+
+```bash
+kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.1.0/deploy/longhorn.yaml
+kubectl patch storageclass longhorn -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
 
 ## Additional Resources
 
 - [Rancher Kubernetes Engine Government (RKE2) Docs](https://docs.rke2.io/)
 - [RKE2 AWS Terraform Docs](https://github.com/rancherfederal/rke2-aws-tf)
-
-
-
-
-
-```
-# update varibles.tf 
-terraform init
-terraform apply
-export KUBECONFIG="$PWD"/rke2.yaml
-```
-Kubeconfig is dumped into working directory as `rke2.yaml`
-
-
-### EBS Storage Class is installed by default.
-
-For Local-Path Storage
-```
-kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-```
-For Longhorn
-```
-kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.1.0/deploy/longhorn.yaml
-kubectl patch storageclass longhorn -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-```
