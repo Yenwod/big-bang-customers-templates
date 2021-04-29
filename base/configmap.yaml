@@ -46,8 +46,8 @@
 #fluentbit:
 #  enabled: false
 #
-#addon:
-#  minioOperator:
-#    enabled: true
-#  minio:
-#    enabled: true
+addon:
+  minioOperator:
+    enabled: true
+  minio:
+    enabled: true
