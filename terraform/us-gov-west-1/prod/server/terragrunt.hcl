@@ -7,10 +7,6 @@ locals {
 
 terraform {
   source = "git::https://repo1.dsop.io/platform-one/distros/rancher-federal/rke2/rke2-aws-terraform.git//?ref=v1.1.8"
-  # after_hook "kubeconfig" {
-  #   commands = ["apply"]
-  #   execute = ["aws", "s3", "cp", "${terraform.rke2.kubeconfig_path}", "rke2.yaml"]
-  # }
 }
 
 include {
