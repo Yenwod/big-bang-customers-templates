@@ -1,9 +1,9 @@
 hostname: bigbang.dev
 #
-#flux:
-#  interval: 1m
-#  rollback:
-#    cleanupOnFail: false
+flux:
+  interval: 1m
+  rollback:
+    cleanupOnFail: false
 #
 #clusterAuditor:
 #  enabled: false
