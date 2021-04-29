@@ -1,4 +1,4 @@
-#hostname: bigbang.dev
+hostname: bigbang.dev
 #
 #flux:
 #  interval: 1m
@@ -46,7 +46,7 @@
 #fluentbit:
 #  enabled: false
 #
-addon:
+addons:
   minioOperator:
     enabled: true
   minio:
