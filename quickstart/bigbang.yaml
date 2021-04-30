@@ -13,6 +13,8 @@ spec:
   url: https://repo1.dsop.io/platform-one/big-bang/customers/template.git
   ref:
     branch: dkpscan
+  secretRef:
+    name: git-creds
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
