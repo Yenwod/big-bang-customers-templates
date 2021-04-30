@@ -68,7 +68,7 @@ addons:
   minioOperator:
     enabled: true
   minio:
-    enabled: true
+    enabled: false
 #    accesskey: lynnio
 #    secretkey: lynnpassword
 #    values:
