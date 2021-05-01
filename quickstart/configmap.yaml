@@ -107,7 +107,7 @@ addons:
           oidc.config: |
             name: P1 SSO
             issuer: https://login.dso.mil/auth/realms/baby-yoda
-            clientID: il2_00eb8904-5b88-4c68-ad67-cec0d2e07aa6_mgmt-argocd
+            clientID: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-argocd
             clientSecret: $oidc.keycloak.clientSecret
             requestedScopes: ["openid", "ArgoCD"]
 
