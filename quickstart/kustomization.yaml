@@ -2,6 +2,8 @@
 #   both the bases reference and the GitRepository reference
 bases:
 - https://repo1.dsop.io/platform-one/big-bang/bigbang.git//base?ref=1.6.2
+resources:
+- ingress-cert.enc.yaml
 configMapGenerator:
   - name: common
     behavior: merge
