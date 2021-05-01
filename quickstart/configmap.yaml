@@ -120,7 +120,7 @@ addons:
           gateways:
             - istio-system/main
           hosts:
-            - argocd-il2-test-bb.admin.dso.mil
+            - argocd.bigbang.dev
 
       server:
         autoscaling:
