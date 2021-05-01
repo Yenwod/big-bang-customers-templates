@@ -6,14 +6,15 @@ kind: Secret
 metadata:
     creationTimestamp: null
     name: wildcard-cert
+    namespace: istio-system
 type: kubernetes.io/tls
 sops:
     kms: []
     gcp_kms: []
     azure_kv: []
     hc_vault: []
-    lastmodified: '2021-05-01T16:12:37Z'
-    mac: ENC[AES256_GCM,data:1/RD8if2fDxG324LNhwwLyly8uijLP380/yfemTR3F1Bt2bnEaIDsru1FIh3+eyGtuuR99/AYKyASuCNvpeRcu4fQHqhnX/sdHz91PjBEVNpugueD0QKS+hP1PVFbKlobRIVW2KLI5xGO35kKhdf2gCQ0p4PNlX+kTEJkO6hA6g=,iv:665U9l8FcIwZ3NDuBsrkL2mgMAs4np2JAjEnZd5X5Yg=,tag:IJL6GoEf6ob30rND34jDdA==,type:str]
+    lastmodified: '2021-05-01T19:02:08Z'
+    mac: ENC[AES256_GCM,data:6sRpKHZxhRf53PCPdY+WBZbaMLhiP+FCe/l5dsn5BniGhtYw30Uy4pw7D1/+PKNRNDVgVmQJ92PrutWZvyS+8M9Y1WfBJmQZBAfBFCJpD/dy3VixXMw64p1iOBHsfWo8JlliSRoUsMuDm9kTUw7xKHtmMypyfWTb6FpdRW9siV0=,iv:Z54wRBUpOv+rygAYuZkYM8qmdbMmBcuJz9o8PCDrh3E=,tag:PN7z+GYS+w7Qt81V7ERHIw==,type:str]
     pgp:
     -   created_at: '2021-05-01T16:12:21Z'
         enc: |
