@@ -129,7 +129,7 @@ addons:
           maxReplicas: 4
 
         config:
-          url: https://argocd-il2-test-bb.admin.dso.mil
+          url: https://argocd.bigbang.dev
           admin.enabled: "false"
           statusbadge.enabled: "true"
           users.anonymous.enabled: "false"
