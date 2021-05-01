@@ -6,7 +6,7 @@ istio:
     ingressGateway:
       minReplicas: 3
       serviceAnnotations:
-        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+        service.beta.kubernetes.io/aws-load-balancer-internal: "false"
         service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
     extraIngressGateways:
       - name: tenant-ingressgateway
@@ -15,7 +15,7 @@ istio:
             minReplicas: 3
             maxReplicas: 4
           serviceAnnotations:
-            service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+            service.beta.kubernetes.io/aws-load-balancer-internal: "false"
             service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
         labels:
           app: istio-ingressgateway
