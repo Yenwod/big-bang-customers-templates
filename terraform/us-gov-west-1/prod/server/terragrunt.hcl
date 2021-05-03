@@ -28,6 +28,13 @@ dependency "ssh" {
   }
 }
 
+dependency "bastion" {
+  config_path = "../bastion"
+  mock_outputs = {
+    sg_id = "sg-bastion-mock"
+  }
+}
+
 inputs = {
   cluster_name  = local.env.name
   vpc_id        = dependency.vpc.outputs.vpc_id
@@ -37,6 +44,8 @@ inputs = {
   instance_type = local.env.cluster.server.type
   download      = false
   enable_ccm    = true
+
+  extra_security_group_ids = [dependency.bastion.outputs.sg_id]
 
   block_device_mappings = {
     size = local.env.cluster.server.storage.size

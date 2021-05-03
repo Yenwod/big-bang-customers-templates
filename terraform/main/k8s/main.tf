@@ -8,14 +8,14 @@ resource "null_resource" "kubeconfig" {
 
       # Merge new config into existing
       export KUBECONFIGBAK=$KUBECONFIG
-      export KUBECONFIG=~/.kube/config:~/.kube/new
+      export KUBECONFIG=~/.kube/new:~/.kube/config
       # Do not redirect to ~/.kube/config or you may truncate the results
       kubectl config view --flatten > ~/.kube/merged
       mv -f ~/.kube/merged ~/.kube/config
 
       # Cleanup
       rm -f ~/.kube/new
-      export KUBECONFIG=$KUBECONFIG
+      export KUBECONFIG=$KUBECONFIGBAK
       unset KUBECONFIGBAK
     EOF
   }

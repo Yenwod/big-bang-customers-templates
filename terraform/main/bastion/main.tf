@@ -8,8 +8,8 @@
 
 # Security group for bastion
 resource "aws_security_group" "bastion_sg" {
-  name   = "${var.name}-bastion"
-  description = "${var.name} bastion access"
+  name_prefix = "${var.name}-bastion-"
+  description = "${var.name} bastion"
   vpc_id = "${var.vpc_id}"
 
   # Allow SSH ingress
@@ -29,6 +29,32 @@ resource "aws_security_group" "bastion_sg" {
     to_port          = 0
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
+  }
+
+  tags = var.tags
+}
+
+# Security group to apply to other resources
+resource "aws_security_group" "bastion_access_sg" {
+  name_prefix = "${var.name}-bastion-access-"
+  description = "${var.name} bastion access to resource"
+  vpc_id = "${var.vpc_id}"
+
+  # Allow SSH ingress from Bastion only
+  ingress {
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    security_groups = ["${aws_security_group.bastion_sg.id}"]
+  }
+
+  # Allow all egress to Bastion only
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    security_groups = ["${aws_security_group.bastion_sg.id}"]
   }
 
   tags = var.tags

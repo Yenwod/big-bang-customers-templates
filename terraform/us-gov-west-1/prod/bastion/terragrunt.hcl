@@ -17,6 +17,7 @@ dependency "vpc" {
   config_path = "../vpc"
   mock_outputs = {
     vpc_id = "mock_vpc_id"
+    public_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
   }
 }
 
@@ -24,6 +25,7 @@ dependency "ssh" {
   config_path = "../ssh"
   mock_outputs = {
     public_key = "mock_public_key"
+    key_name = "mock_key_name"
   }
 }
 
