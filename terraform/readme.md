@@ -76,6 +76,25 @@ terraform
     kubectl get no
     ```
 
+## RKE2 Storage
+
+In order for Big Bang to deploy properly, it must have a default storage class.  The following will install a storage class for [AWS EBS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html).
+
+```bash
+kubectl apply -f ./terraform/storageclass/ebs-gp2-storage-class.yaml
+```
+
+If you have an alternative storage class, you can run the following to replace the EBS GP2 one provided.
+
+```bash
+kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+kubectl apply -f <path to your storage class.yaml>
+# For example...
+# Local-path: https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+# Longhorn: https://raw.githubusercontent.com/longhorn/longhorn/v1.1.0/deploy/longhorn.yaml
+kubectl patch storageclass <name of your storage class> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
 At this point, you can deploy Big Bang according to the product documentation.
 
 ## Infrastructure
@@ -182,25 +201,6 @@ subgraph store [S3 Bucket]
 end
 ```
 
-## RKE2 Storage
-
-In order for Big Bang to deploy properly, it must have a default storage class.  The following will install a storage class for [AWS EBS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html).
-
-```bash
-kubectl apply -f ./terraform/storageclass/ebs-gp2-storage-class.yaml
-```
-
-If you have an alternative storage class, you can run the following to replace the EBS GP2 one provided.
-
-```bash
-kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-kubectl apply -f <path to your storage class.yaml>
-# For example...
-# Local-path: https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-# Longhorn: https://raw.githubusercontent.com/longhorn/longhorn/v1.1.0/deploy/longhorn.yaml
-kubectl patch storageclass <name of your storage class> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-```
-
 ## Debug
 
 After Big Bang deployment, if you wish to access your deployed web applications that are not exposed publically, add an entry into your /etc/hosts to point the host name to the internal load balancer created by Istio in Big Bang.  This requires that you maintain a sshuttle tunnel to the bastion server, but gives you DNS capabilities for applications.
@@ -225,6 +225,10 @@ dig $LBDNS +short | head -1
 # You may need to log out and back into for hosts to take effect
 sudo vi /etc/hosts  # <IP of load balancer> <host name>
 ```
+
+## Optional Terraform
+
+Depending on your needs, you may want to deploy additional infrastructure, such as Key Stores, S3 Buckets, or Databases, that can be used with your deployment.  In the [options](./options) directory, you will find terraform / terragrunt snippits that can assist you in deploying these items.
 
 ## Additional Resources
 
