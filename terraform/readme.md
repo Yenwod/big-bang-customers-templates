@@ -42,20 +42,41 @@ terraform
 - Run the deployment
 
     ```bash
+    # Pre-check
+    terragrunt run-all plan
+
+    # Deploy
     terragrunt run-all apply
     ```
 
 - Connect to cluster
 
     ```bash
-    TBD
+    # Setup your cluster name (same as `name` in `env.yaml`)
+    export CNAME="bigbang-dev"
+
+    # Get Bastion Security Group ID
+    export BSG=`aws ec2 describe-instances --filters "Name=tag:Name,Values=$CNAME-bastion" --query 'Reservations[*].Instances[*].SecurityGroups[*].GroupId' --output text`
+
+    # Get your public IP address
+    export MYIP=`curl -s http://checkip.amazonaws.com/`
+
+    # Add SSH ingress for your IP to the bastion security group
+    aws ec2 authorize-security-group-ingress --group-id $BSG --protocol tcp --port 22 --cidr $MYIP/32
+
+    # Get Bastion public IP address
+    export BIP=`aws ec2 describe-instances --filters "Name=tag:Name,Values=$CNAME-bastion" --query 'Reservations[*].Instances[*].PublicIpAddress' --output text`
+
+    # Use sshuttle to tunnel traffic through bastion public IP
+    # You can add the '-D' option to sshuttle to run this as a daemon.
+    # Otherwise, you will need another terminal to continue.
+    sshuttle --dns -vr ec2-user@$BIP 10.0.0.0/8 --ssh-cmd "ssh -i ~/.ssh/$CNAME.pem"
+
+    # Validate connectivity
+    kubectl get no
     ```
 
-- Shell into nodes
-
-    ```bash
-    TBD
-    ```
+At this point, you can deploy Big Bang according to the product documentation.
 
 ## Infrastructure
 
@@ -90,6 +111,12 @@ Once the terraform has run, you will have the following resources deployed:
     - Internal cluster ingress allowed
     - Control Plane traffic limited to port 6443 and 9345 to servers
   - SSH keys created and stored on all nodes.  Private key is stored locally in `~/.ssh`
+- [CoreDNS](https://coredns.io/)
+- [Metrics Server](https://github.com/kubernetes-sigs/metrics-server)
+- Bastion
+  - Autoscale group insures one bastion is available
+  - Security group allows SSH on Whitelist IP
+  - Cluster setup to allow SSH from Bastion
 - S3 Storage Bucket
   - RKE2 Kubeconfig for accessing cluster
   - RKE2 access token for adding additional nodes
@@ -102,13 +129,16 @@ flowchart TD;
 internet((Internet)) --- igw
 
 subgraph VPC
+  igw(Internet Gateway) ---|SSH| jump
   igw(Internet Gateway) ---|Elastic IP| nat1 & nat2 & nat3
-
+  jump -.- bscale(Autoscale: Bastion)
 
   subgraph za [Zone A]
     nat1 --- zapriv
+    jump --- zapriv
     subgraph zapub [Public Subnet]
       nat1(NAT Gateway)
+      jump(Bastion Server)
     end
     subgraph zapriv [Private Subnet]
       cp(RKE2 Control Plane\nLoad Balancer)
@@ -156,20 +186,44 @@ end
 
 In order for Big Bang to deploy properly, it must have a default storage class.  The following will install a storage class for [AWS EBS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AmazonEBS.html).
 
-### Local-Path
-
 ```bash
-kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
-kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+kubectl apply -f ./terraform/storageclass/ebs-gp2-storage-class.yaml
 ```
 
-### Longhorn
+If you have an alternative storage class, you can run the following to replace the EBS GP2 one provided.
 
 ```bash
 kubectl patch storageclass ebs -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
-kubectl apply -f https://raw.githubusercontent.com/longhorn/longhorn/v1.1.0/deploy/longhorn.yaml
-kubectl patch storageclass longhorn -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+kubectl apply -f <path to your storage class.yaml>
+# For example...
+# Local-path: https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+# Longhorn: https://raw.githubusercontent.com/longhorn/longhorn/v1.1.0/deploy/longhorn.yaml
+kubectl patch storageclass <name of your storage class> -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+## Debug
+
+After Big Bang deployment, if you wish to access your deployed web applications that are not exposed publically, add an entry into your /etc/hosts to point the host name to the internal load balancer created by Istio in Big Bang.  This requires that you maintain a sshuttle tunnel to the bastion server, but gives you DNS capabilities for applications.
+
+The following example sets up a DNS route for `*.bigbang.dev` to the internal load balancer created by Big Bang.
+
+```bash
+# Setup cluster name from env.yaml
+export CName="bigbang-dev"
+
+# Get VPC info
+export VPCId=`aws ec2 describe-vpcs --filters "Name=tag:Name,Values=$CName" --query 'Vpcs[*].VpcId' --output text`
+
+# Get load balancer in VPC that does not contain cluster name
+# Istio in Big Bang creates a load balancer
+export LBDNS=`aws elb describe-load-balancers --query "LoadBalancerDescriptions[? VPCId == '$VPCId' && "'!'"contains(LoadBalancerName, '$CName')].DNSName" --output text`
+
+# Retrieve IP address of load balancer for /etc/hosts
+dig $LBDNS +short | head -1
+
+# Now add the hostname of the web appliation into /etc/hosts
+# You may need to log out and back into for hosts to take effect
+sudo vi /etc/hosts  # <IP of load balancer> <host name>
 ```
 
 ## Additional Resources
