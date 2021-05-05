@@ -277,10 +277,10 @@ addons:
       replicas: 1
 
   gitlabRunner:
-    enabled: false
+    enabled: true
 
   gitlab:
-    enabled: false
+    enabled: true
     hostnames:
       gitlab: gitlab.bigbang.dev
       registry: registry.bigbang.dev
