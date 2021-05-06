@@ -126,4 +126,4 @@ addons:
     enabled: true
 
   velero:
-    enabled: true
+    enabled: false
