@@ -12,6 +12,9 @@ sso:
     realm: baby-yoda
   client_secret: ""
 
+gatekeeper:
+  values:
+    replicas: 1
 
 addons:
 
