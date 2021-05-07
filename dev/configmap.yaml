@@ -5,6 +5,74 @@ flux:
   rollback:
     cleanupOnFail: false
 
+clusterAuditor:
+  enabled: true
+
+gatekeeper:
+  enabled: true
+  values:
+    replicas: 1
+
+istiooperator:
+  enabled: true
+
+istio:
+  enabled: true
+
+  values:
+    ingressGateway:
+      serviceAnnotations:
+        # Ensure mission apps have internal load balancer only
+        service.beta.kubernetes.io/aws-load-balancer-internal: "true"
+        # Enable cross zone load balancing
+        service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+
+jaeger:
+  enabled: true
+
+kiali:
+  enabled: true
+
+logging:
+  enabled: true
+  values:
+    elasticsearch:
+      master:
+        count: 1
+        persistence:
+          size: 5Gi
+        resources:
+          limits:
+            cpu: 1
+            memory: 3Gi
+      data:
+        count: 1
+        persistence:
+          size: 5Gi
+        resources:
+          limits:
+            cpu: 1
+            memory: 3Gi
+
+eckoperator:
+  enabled: true
+
+fluentbit:
+  enabled: true
+
+monitoring:
+  enabled: true
+
+twistlock:
+  enabled: true
+  values:
+    console:
+      persistence:
+        size: 5Gi
+
+minio:
+  enabled: false
+
 # Gloabl SSO parameters
 sso:
   oidc:
@@ -12,9 +80,6 @@ sso:
     realm: baby-yoda
   client_secret: ""
 
-gatekeeper:
-  values:
-    replicas: 1
 
 addons:
 
