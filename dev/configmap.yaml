@@ -18,6 +18,9 @@ istiooperator:
 
 istio:
   enabled: true
+  ingress:
+    key: ""
+    cert: ""
 
   values:
     ingressGateway:
