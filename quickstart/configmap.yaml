@@ -52,6 +52,9 @@ monitoring:
 
 addons:
   argocd:
+    git:
+      tag: ""
+      branch: "monitoring-and-helm-tests"
     enabled: true
     sso:
       enabled: true
@@ -63,6 +66,8 @@ addons:
       server: 
         config:
           url: https://argocd.bigbang.dev
+      monitoring:
+        enabled: true
 
   authservice:
     enabled: true
