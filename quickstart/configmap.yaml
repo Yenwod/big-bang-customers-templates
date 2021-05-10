@@ -98,6 +98,9 @@ addons:
   authservice:
     enabled: false
 
+  haproxy:
+    enabled: false
+
   gitlab:
     enabled: false
     sso:
