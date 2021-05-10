@@ -132,6 +132,8 @@ addons:
       auth_endpoint: "https://login.dso.mil/oauth/authorize"
       token_endpoint: "https://login.dso.mil/oauth/token"
       user_api_endpoint: "https://login.dso.mil/api/v4/user"
+    tag: ""
+    branch: "7-update-mattermost-to-5-33-3"
     
   minioOperator:
     enabled: true
