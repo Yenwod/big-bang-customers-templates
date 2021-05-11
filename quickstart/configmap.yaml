@@ -79,20 +79,20 @@ addons:
       server: 
         config:
           url: https://argocd.bigbang.dev
-      monitoring:
-        enabled: true
-      controller:
-        metrics:
-          enabled: true
-      dex:
-        metrics:
-          enabled: true
-      server:
-        metrics:
-          enabled: true
-      repoServer:
-        metrics:
-          enabled: true
+      #monitoring:
+      #  enabled: true
+      #controller:
+      #  metrics:
+      #    enabled: true
+      #dex:
+      #  metrics:
+      #    enabled: true
+      #server:
+      #  metrics:
+      #    enabled: true
+      #repoServer:
+      #  metrics:
+      #    enabled: true
 
   authservice:
     enabled: false
