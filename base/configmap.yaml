@@ -1,9 +1,9 @@
 hostname: bigbang.dev
 #
-flux:
-  interval: 1m
-  rollback:
-    cleanupOnFail: false
+#flux:
+#  interval: 1m
+#  rollback:
+#    cleanupOnFail: false
 #
 #clusterAuditor:
 #  enabled: false
@@ -46,8 +46,8 @@ flux:
 #fluentbit:
 #  enabled: false
 #
-addons:
-  minioOperator:
-    enabled: true
-  minio:
-    enabled: false
+#addons:
+#  minioOperator:
+#    enabled: true
+#  minio:
+#    enabled: false
