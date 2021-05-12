@@ -1,11 +1,3 @@
-# resource "aws_instance" "bastion" {
-#   ami                         = "ami-017e342d9500ef3b2"
-#   instance_type               = "t2.micro"
-#   associate_public_ip_address = true
-#   key_name = var.ssh_keys
-#   tags = var.tags
-# }
-
 # Security group for bastion
 resource "aws_security_group" "bastion_sg" {
   name_prefix = "${var.name}-bastion-"
@@ -29,24 +21,6 @@ resource "aws_security_group" "bastion_sg" {
     to_port          = 0
     protocol         = "-1"
     cidr_blocks      = ["0.0.0.0/0"]
-  }
-
-  tags = var.tags
-}
-
-# Security group to apply to other resources
-resource "aws_security_group" "bastion_to_cluster_sg" {
-  name_prefix = "${var.name}-bastion-to-cluster-"
-  description = "${var.name} bastion to cluster access"
-  vpc_id = "${var.vpc_id}"
-
-  # Allow SSH ingress from Bastion only
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    security_groups = ["${aws_security_group.bastion_sg.id}"]
   }
 
   tags = var.tags
@@ -88,15 +62,3 @@ resource "aws_autoscaling_group" "bastion_asg" {
     }
   }
 }
-
-
-# Load Balancer in public subnet that proxies port 22 to Bastion
-
-# resource "aws_security_group_rule" "rke2_ssh" {
-#   from_port         = 22
-#   to_port           = 22
-#   protocol          = "tcp"
-#   security_group_id = module.rke2.cluster_data.cluster_sg
-#   type              = "ingress"
-#   cidr_blocks       = ["0.0.0.0/0"]
-# }
