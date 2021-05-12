@@ -55,7 +55,7 @@ fluentbit:
         type: spc_t
 
 monitoring:
-  enabled: false
+  enabled: true
   sso:
     enabled: true
     prometheus:
@@ -79,20 +79,20 @@ addons:
       server: 
         config:
           url: https://argocd.bigbang.dev
-      #monitoring:
-      #  enabled: true
-      #controller:
-      #  metrics:
-      #    enabled: true
-      #dex:
-      #  metrics:
-      #    enabled: true
-      #server:
-      #  metrics:
-      #    enabled: true
-      #repoServer:
-      #  metrics:
-      #    enabled: true
+      monitoring:
+        enabled: true
+      controller:
+        metrics:
+          enabled: true
+      dex:
+        metrics:
+          enabled: true
+      server:
+        metrics:
+          enabled: true
+      repoServer:
+        metrics:
+          enabled: true
 
   authservice:
     enabled: false
@@ -133,17 +133,17 @@ addons:
             memory: 5G
 
   sonarqube:
-    enabled: false
+    enabled: true
     sso:
       enabled: true
       client_id: platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-saml-sonarqube
       label: "BB SSO"
 
   mattermostoperator:
-    enabled: false
+    enabled: true
 
   mattermost:
-    enabled: false
+    enabled: true
     sso:
       enabled: true
       client_id: "platform1_a8604cc9-f5e9-4656-802d-d05624370245_bb8-mattermost"
@@ -156,10 +156,10 @@ addons:
       #branch: ""
     
   minioOperator:
-    enabled: false
+    enabled: true
 
   minio:
-    enabled: false
+    enabled: true
 
   velero:
     enabled: false
