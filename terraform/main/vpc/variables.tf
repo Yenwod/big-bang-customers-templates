@@ -9,7 +9,6 @@ variable "vpc_cidr" {
   type        = string
 }
 
-# Assumption: region has 3 availability zones named a, b, and c
 variable "aws_region" {
   description = "The AWS region to deploy resources"
   type    = string

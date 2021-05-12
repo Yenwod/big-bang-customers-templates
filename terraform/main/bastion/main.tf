@@ -48,7 +48,7 @@ resource "aws_autoscaling_group" "bastion_asg" {
   min_size             = 1
   desired_capacity     = 1
   launch_configuration = "${aws_launch_configuration.bastion_lc.name}"
-  vpc_zone_identifier  = var.subnets
+  vpc_zone_identifier  = var.subnet_ids
 
   dynamic "tag" {
     for_each = merge({

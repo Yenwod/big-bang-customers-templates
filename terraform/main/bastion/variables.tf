@@ -9,8 +9,8 @@ variable "vpc_id" {
   type = string
 }
 
-variable "subnets" {
-  description = "List of subnets where the bastion is allowed"
+variable "subnet_ids" {
+  description = "List of subnet ids where the bastion is allowed"
   type = list(string)
 }
 
@@ -31,13 +31,6 @@ variable "key_name" {
   type        = string
   default = ""
 }
-
-variable "cidrs" {
-  description = "List of CIDRs that can access the bastion"
-  type = list(string)
-  default = []
-}
-
 variable "tags" {
   description = "The tags to apply to resources"
   type = map(string)

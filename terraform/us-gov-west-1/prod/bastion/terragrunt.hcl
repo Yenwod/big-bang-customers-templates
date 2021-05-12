@@ -17,7 +17,7 @@ dependency "vpc" {
   config_path = "../vpc"
   mock_outputs = {
     vpc_id = "mock_vpc_id"
-    public_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+    public_subnet_ids = ["mock_pub_subnet1", "mock_pub_subnet2", "mock_pub_subnet3"]
   }
 }
 
@@ -32,7 +32,7 @@ dependency "ssh" {
 inputs = {
   name  = local.env.name
   vpc_id = dependency.vpc.outputs.vpc_id
-  subnets = dependency.vpc.outputs.public_subnets
+  subnet_ids = dependency.vpc.outputs.public_subnet_ids
   ami = local.env.bastion.image
   instance_type = local.env.bastion.type
   key_name = dependency.ssh.outputs.key_name

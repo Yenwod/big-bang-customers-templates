@@ -17,7 +17,7 @@ dependency "vpc" {
   config_path = "../vpc"
   mock_outputs = {
     vpc_id = "vpc-mock"
-    private_subnets = ["10.0.1.0/24", "10.0.2.0/24", "10.0.3.0/24"]
+    private_subnet_ids = ["mock_priv_subnet1", "mock_priv_subnet2", "mock_priv_subnet3"]
   }
 }
 
@@ -31,7 +31,7 @@ dependency "ssh" {
 inputs = {
   cluster_name  = local.env.name
   vpc_id        = dependency.vpc.outputs.vpc_id
-  subnets       = dependency.vpc.outputs.private_subnets
+  subnets       = dependency.vpc.outputs.private_subnet_ids
   ami           = local.env.cluster.server.image
   servers       = local.env.cluster.server.replicas
   instance_type = local.env.cluster.server.type
